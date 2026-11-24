@@ -17,3 +17,18 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// REST API VSM (read-only) untuk website lain — autentikasi Bearer token (VSM_API_TOKENS)
+Route::prefix('v1')->middleware(['vsm.api', 'throttle:api'])->group(function () {
+    Route::get('/ping', fn () => response()->json(['status' => 'ok', 'time' => now()->toIso8601String()]));
+    Route::get('/projects', [\App\Http\Controllers\Api\ProjectApiController::class, 'index']);
+    Route::get('/projects/{code}', [\App\Http\Controllers\Api\ProjectApiController::class, 'show'])->where('code', '.*');
+});
+
+// REST API VSM format {success,message,data}: /api/vsm/summary, /projects, /projects/{kode}, /material
+Route::prefix('vsm')->middleware(['vsm.api', 'throttle:api'])->group(function () {
+    Route::get('/summary', [\App\Http\Controllers\Api\VsmApiController::class, 'summary']);
+    Route::get('/projects', [\App\Http\Controllers\Api\VsmApiController::class, 'projects']);
+    Route::get('/projects/{code}', [\App\Http\Controllers\Api\VsmApiController::class, 'project'])->where('code', '.*');
+    Route::get('/material', [\App\Http\Controllers\Api\VsmApiController::class, 'material']);
+});

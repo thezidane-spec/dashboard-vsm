@@ -13,6 +13,11 @@ class MaterialRadarItem extends Model
         'required_date' => 'date', 'arrival_date' => 'date',
     ];
 
+    public function radar()
+    {
+        return $this->belongsTo(MaterialRadar::class, 'material_radar_id');
+    }
+
     // PIC yang berhak mengubah tiap kolom (warna kolom mengikuti PIC-nya)
     public static array $fieldPic = [
         'no' => 'engineering', 'material_code' => 'engineering', 'description' => 'engineering', 'spec' => 'engineering', 'req_qty' => 'engineering',
