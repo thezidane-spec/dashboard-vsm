@@ -312,8 +312,9 @@
         $canEditProduction  = in_array($role, ['admin', 'ppic', 'production']);
         $canEditDelivery    = in_array($role, ['admin', 'ppic', 'production']);
         $canEditQC          = in_array($role, ['admin', 'ppic', 'qc_qa', 'qc']);
+        $canEditFinishing   = in_array($role, ['admin', 'ppic', 'qc_qa', 'qc', 'production']); // Finish Process: production juga boleh
         
-        $canSubmitAny = $canEditGeneral || $canEditProcurement || $canEditPPIC || $canEditEngineering || $canEditProduction || $canEditQC;
+        $canSubmitAny = $canEditGeneral || $canEditProcurement || $canEditPPIC || $canEditEngineering || $canEditProduction || $canEditQC || $canEditFinishing;
 
         // Detail Material (Raw Material & Vendor Raw Material) - popup di kotak Raw Material
         $canEditMaterial = $canEditProcurement;
@@ -1309,20 +1310,20 @@
                     <div class="division-title-bar">
                         <div class="d-flex align-items-center gap-3 flex-wrap">
                             <h6 class="fw-bold m-0 text-success"><i class="bi bi-shield-check me-1"></i> DIVISI FINISH PROCESS</h6>
-                            @include('projects.partials.task-dropdown', ['division' => 'finishing', 'info' => \App\Models\Project::$qcTaskInfo, 'canEdit' => $canEditQC])
+                            @include('projects.partials.task-dropdown', ['division' => 'finishing', 'info' => \App\Models\Project::$qcTaskInfo, 'canEdit' => $canEditFinishing])
                         </div>
                         <span class="badge bg-success-subtle text-success border border-success fw-bold">Bobot Divisi: {{ array_sum(\App\Models\Project::$qcTasks) }}%</span>
                     </div>
                     <div class="row align-items-center g-3 mb-3 form-2col">
                         <div class="col-md-3">
                             <label class="form-label-custom">Due Date</label>
-                            @if(!$canEditQC) <input type="hidden" name="due_date_qc" value="{{ $project->due_date_qc ? $project->due_date_qc->format('Y-m-d') : '' }}"> @endif
-                            <input type="date" name="due_date_qc" class="form-control-custom {{ !$canEditQC ? 'form-control-readonly' : '' }}" value="{{ $project->due_date_qc ? $project->due_date_qc->format('Y-m-d') : '' }}" {{ !$canEditQC ? 'disabled' : '' }}>
+                            @if(!$canEditFinishing) <input type="hidden" name="due_date_qc" value="{{ $project->due_date_qc ? $project->due_date_qc->format('Y-m-d') : '' }}"> @endif
+                            <input type="date" name="due_date_qc" class="form-control-custom {{ !$canEditFinishing ? 'form-control-readonly' : '' }}" value="{{ $project->due_date_qc ? $project->due_date_qc->format('Y-m-d') : '' }}" {{ !$canEditFinishing ? 'disabled' : '' }}>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label-custom">Planning (%)</label>
-                            @if(!$canEditQC) <input type="hidden" name="plan_qc" value="{{ $project->plan_qc }}"> @endif
-                            <input type="number" name="plan_qc" class="form-control-custom {{ !$canEditQC ? 'form-control-readonly' : '' }}" value="{{ $project->plan_qc }}" min="0" max="100" {{ !$canEditQC ? 'disabled' : '' }}>
+                            @if(!$canEditFinishing) <input type="hidden" name="plan_qc" value="{{ $project->plan_qc }}"> @endif
+                            <input type="number" name="plan_qc" class="form-control-custom {{ !$canEditFinishing ? 'form-control-readonly' : '' }}" value="{{ $project->plan_qc }}" min="0" max="100" {{ !$canEditFinishing ? 'disabled' : '' }}>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label-custom">Actual Progress Divisi</label>
@@ -1334,8 +1335,8 @@
                         </div>
                     </div>
                     @include('projects.partials.late-summary', ['division' => 'finishing', 'info' => \App\Models\Project::$qcTaskInfo])
-                    @include('projects.partials.task-grid', ['division' => 'finishing', 'info' => \App\Models\Project::$qcTaskInfo, 'canEdit' => $canEditQC])
-                @include('projects.partials.division-problem', ['division' => 'finishing', 'canInput' => $canEditQC])
+                    @include('projects.partials.task-grid', ['division' => 'finishing', 'info' => \App\Models\Project::$qcTaskInfo, 'canEdit' => $canEditFinishing])
+                @include('projects.partials.division-problem', ['division' => 'finishing', 'canInput' => $canEditFinishing])
                 </div>
 
                 <!-- 6. DIVISI QA/QC (MDR & NDT, dipisah dari Finishing) -->

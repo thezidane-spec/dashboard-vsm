@@ -383,6 +383,11 @@ class DashboardController extends Controller
             'task_inspection_customer' => 'qc_qa',
         ];
 
+        // Jobdesk Finish Process punya hak akses sendiri ('finishing'): QC/QA, PPIC, Admin DAN Production.
+        foreach ($finishingTaskKeys as $finishingKey) {
+            $taskDepartmentMap[$finishingKey] = 'finishing';
+        }
+
         // Snapshot progress % lama tiap job (dipakai deteksi perubahan & kalkulasi progress)
         $oldTasks = [];
         foreach ($taskDepartmentMap as $taskKey => $dept) {
@@ -396,6 +401,7 @@ class DashboardController extends Controller
             'engineering' => in_array($role, ['admin', 'ppic', 'engineering']),
             'production'  => in_array($role, ['admin', 'ppic', 'production']),
             'qc_qa'       => in_array($role, ['admin', 'ppic', 'qc_qa']),
+            'finishing'   => in_array($role, ['admin', 'ppic', 'qc_qa', 'production']),
         ];
 
         // Problem per divisi (diinput di halaman update progress; otomatis masuk ke Remarks Report).
@@ -406,7 +412,7 @@ class DashboardController extends Controller
             'procurement' => !empty($canEdit['procurement']),
             'ppic'        => !empty($canEdit['ppic']),
             'production'  => !empty($canEdit['production']),
-            'finishing'   => $qcAllowed,
+            'finishing'   => !empty($canEdit['finishing']) || $role === 'qc',
             'qaqc'        => $qcAllowed,
         ];
         foreach ((array) $request->input('div_problem', []) as $divKey => $divRow) {
@@ -456,7 +462,12 @@ class DashboardController extends Controller
         // Due Date & Tanggal Update per job Divisi Finishing & QA/QC: sama seperti divisi lain di atas.
         if (empty($canEdit['qc_qa'])) {
             unset($validated['due_date_qaqc'], $validated['plan_qaqc']);
-            foreach (array_merge($finishingTaskKeys, $qaqcTaskKeys) as $taskKey) {
+            foreach ($qaqcTaskKeys as $taskKey) {
+                unset($validated["due_date_{$taskKey}"], $validated["last_update_{$taskKey}"], $validated["start_date_{$taskKey}"]);
+            }
+        }
+        if (empty($canEdit['finishing'])) {
+            foreach ($finishingTaskKeys as $taskKey) {
                 unset($validated["due_date_{$taskKey}"], $validated["last_update_{$taskKey}"], $validated["start_date_{$taskKey}"]);
             }
         }
@@ -513,7 +524,7 @@ class DashboardController extends Controller
         // Dropdown "Jobdesk" divisi lain (PPIC, Preparation, Production, Finish Process, QA/QC) -- pola sama dengan Engineering.
         // Disimpan di kolom JSON tasks_disabled: {"ppic":[...], "preparation":[...], ...}; divisi tanpa jobdesk mati tidak disimpan.
         $disabledExtra = [];
-        $divisionRights = ['ppic' => 'ppic', 'preparation' => 'production', 'main_production' => 'production', 'finishing' => 'qc_qa', 'qaqc' => 'qc_qa'];
+        $divisionRights = ['ppic' => 'ppic', 'preparation' => 'production', 'main_production' => 'production', 'finishing' => 'finishing', 'qaqc' => 'qc_qa'];
         $divisionNames  = ['ppic' => 'PPIC', 'preparation' => 'Preparation', 'main_production' => 'Production', 'finishing' => 'Finish Process', 'qaqc' => 'QA/QC'];
         $disabledAll    = (array) ($project->tasks_disabled ?? []);
         $disabledTouched = false;
