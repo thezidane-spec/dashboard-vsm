@@ -25,9 +25,11 @@ Route::prefix('v1')->middleware(['vsm.api', 'throttle:api'])->group(function () 
     Route::get('/projects/{code}', [\App\Http\Controllers\Api\ProjectApiController::class, 'show'])->where('code', '.*');
 });
 
-// REST API VSM format {success,message,data}: /api/vsm/summary, /projects, /projects/{kode}, /material
+// Ringkasan VSM publik, serupa endpoint /api/qc/summary pada sistem QC.
+Route::get('/vsm/summary', [\App\Http\Controllers\Api\VsmApiController::class, 'summary']);
+
+// REST API VSM selain ringkasan tetap memakai Bearer token.
 Route::prefix('vsm')->middleware(['vsm.api', 'throttle:api'])->group(function () {
-    Route::get('/summary', [\App\Http\Controllers\Api\VsmApiController::class, 'summary']);
     Route::get('/projects', [\App\Http\Controllers\Api\VsmApiController::class, 'projects']);
     Route::get('/projects/{code}', [\App\Http\Controllers\Api\VsmApiController::class, 'project'])->where('code', '.*');
     Route::get('/material', [\App\Http\Controllers\Api\VsmApiController::class, 'material']);
