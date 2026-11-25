@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 /**
  * REST API VSM (read-only), format respons seragam:
  *   {"success": true, "message": "...", "data": {...}}
- * Endpoint: /api/vsm/summary (publik), /api/vsm/projects, /api/vsm/projects/{kode}, /api/vsm/material
+ * Public endpoints: /api/vsm/summary, /api/vsm/projects, /api/vsm/projects/{kode}, /api/vsm/material
  */
 class VsmApiController extends Controller
 {

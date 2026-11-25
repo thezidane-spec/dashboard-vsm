@@ -7,17 +7,29 @@ use Tests\TestCase;
 
 class VsmApiAccessTest extends TestCase
 {
-    public function test_summary_endpoint_is_public(): void
+    public function test_vsm_api_endpoints_are_public(): void
     {
-        $route = app('router')->getRoutes()->match(Request::create('/api/vsm/summary', 'GET'));
+        $paths = [
+            '/api/v1/ping',
+            '/api/v1/projects',
+            '/api/v1/projects/VSM-77',
+            '/api/vsm/summary',
+            '/api/vsm/projects',
+            '/api/vsm/projects/VSM-77',
+            '/api/vsm/material',
+        ];
 
-        $this->assertNotContains('vsm.api', $route->gatherMiddleware());
+        foreach ($paths as $path) {
+            $route = app('router')->getRoutes()->match(Request::create($path, 'GET'));
+
+            $this->assertNotContains('vsm.api', $route->gatherMiddleware(), "Expected {$path} to be public.");
+        }
     }
 
-    public function test_project_endpoint_still_requires_api_token(): void
+    public function test_user_endpoint_remains_authenticated(): void
     {
-        $route = app('router')->getRoutes()->match(Request::create('/api/vsm/projects', 'GET'));
+        $route = app('router')->getRoutes()->match(Request::create('/api/user', 'GET'));
 
-        $this->assertContains('vsm.api', $route->gatherMiddleware());
+        $this->assertContains('auth:sanctum', $route->gatherMiddleware());
     }
 }
