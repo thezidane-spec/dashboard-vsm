@@ -22,6 +22,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/projects/{project}/edit', [DashboardController::class, 'edit'])->name('projects.edit');
     Route::put('/projects/{project}', [DashboardController::class, 'update'])->name('projects.update');
     Route::delete('/projects/{project}', [DashboardController::class, 'destroy'])->name('projects.destroy');
+    Route::put('/projects/{project}/weights/material', [DashboardController::class, 'updateMaterialWeight'])->name('projects.weights.material.update');
+    Route::delete('/projects/{project}/weights/material', [DashboardController::class, 'deleteMaterialWeight'])->name('projects.weights.material.delete');
+    Route::put('/projects/{project}/weights/finished', [DashboardController::class, 'updateFinishedWeight'])->name('projects.weights.finished.update');
+    Route::delete('/projects/{project}/weights/finished', [DashboardController::class, 'deleteFinishedWeight'])->name('projects.weights.finished.delete');
 
     // Fitur Blocker Log / Issue Tracking
     Route::post('/projects/{project}/issues', [DashboardController::class, 'storeIssue'])->name('projects.issues.store');

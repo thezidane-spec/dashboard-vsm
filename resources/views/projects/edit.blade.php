@@ -1189,6 +1189,13 @@
                             </label>
                         </div>
                     </div>
+                    @include('projects.partials.weight-card', [
+                        'anchor' => 'procurement-weight',
+                        'title' => 'Tonase Total Material',
+                        'value' => $project->total_material_weight_kg,
+                        'canEdit' => $canEditProcurement,
+                        'modalId' => 'modalMaterialWeight',
+                    ])
                 @include('projects.partials.division-problem', ['division' => 'procurement', 'canInput' => $canEditProcurement])
                 </div>
 
@@ -1377,6 +1384,13 @@
                     </div>
                     @include('projects.partials.late-summary', ['division' => 'qaqc', 'info' => $qaqcInfo])
                     @include('projects.partials.task-grid', ['division' => 'qaqc', 'info' => $qaqcInfo, 'canEdit' => $canEditQC])
+                    @include('projects.partials.weight-card', [
+                        'anchor' => 'finished-weight',
+                        'title' => 'Tonase Total Proyek Selesai',
+                        'value' => $project->finished_project_weight_kg,
+                        'canEdit' => $canEditQC,
+                        'modalId' => 'modalFinishedWeight',
+                    ])
                 @include('projects.partials.division-problem', ['division' => 'qaqc', 'canInput' => $canEditQC])
                 </div>
             </div>
@@ -1703,6 +1717,23 @@
                 @endif
             </div>
         </form> <!-- AKHIR FORM UTAMA PROYEK DITUTUP DI SINI -->
+
+        @include('projects.partials.weight-modal', [
+            'modalId' => 'modalMaterialWeight',
+            'title' => 'Tonase Total Material',
+            'field' => 'total_material_weight_kg',
+            'value' => $project->total_material_weight_kg,
+            'updateRoute' => route('projects.weights.material.update', $project->id),
+            'deleteRoute' => route('projects.weights.material.delete', $project->id),
+        ])
+        @include('projects.partials.weight-modal', [
+            'modalId' => 'modalFinishedWeight',
+            'title' => 'Tonase Total Proyek Selesai',
+            'field' => 'finished_project_weight_kg',
+            'value' => $project->finished_project_weight_kg,
+            'updateRoute' => route('projects.weights.finished.update', $project->id),
+            'deleteRoute' => route('projects.weights.finished.delete', $project->id),
+        ])
 
         @if($canEditGeneral)
         <!-- POPUP KONFIRMASI HAPUS PROYEK (admin & PPIC). Form-nya terpisah dari form utama. -->

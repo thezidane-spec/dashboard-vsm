@@ -740,6 +740,78 @@ class DashboardController extends Controller
         return redirect()->route('dashboard')->with('success', 'Progress & target departemen berhasil diperbarui!');
     }
 
+    public function updateMaterialWeight(Request $request, Project $project)
+    {
+        return $this->saveProjectWeight(
+            $request,
+            $project,
+            'total_material_weight_kg',
+            ['admin', 'ppic', 'procurement'],
+            'Tonase total material',
+            'procurement-weight'
+        );
+    }
+
+    public function deleteMaterialWeight(Request $request, Project $project)
+    {
+        return $this->clearProjectWeight(
+            $request,
+            $project,
+            'total_material_weight_kg',
+            ['admin', 'ppic', 'procurement'],
+            'Tonase total material',
+            'procurement-weight'
+        );
+    }
+
+    public function updateFinishedWeight(Request $request, Project $project)
+    {
+        return $this->saveProjectWeight(
+            $request,
+            $project,
+            'finished_project_weight_kg',
+            ['admin', 'ppic', 'qc_qa', 'qc'],
+            'Tonase total proyek selesai',
+            'finished-weight'
+        );
+    }
+
+    public function deleteFinishedWeight(Request $request, Project $project)
+    {
+        return $this->clearProjectWeight(
+            $request,
+            $project,
+            'finished_project_weight_kg',
+            ['admin', 'ppic', 'qc_qa', 'qc'],
+            'Tonase total proyek selesai',
+            'finished-weight'
+        );
+    }
+
+    private function saveProjectWeight(Request $request, Project $project, string $field, array $roles, string $label, string $anchor)
+    {
+        abort_unless(in_array(strtolower((string) $request->user()->role), $roles, true), 403);
+
+        $validated = $request->validate([
+            $field => 'required|numeric|min:0|max:999999999999.999',
+        ]);
+
+        $project->update([$field => $validated[$field]]);
+
+        return redirect()->to(route('projects.edit', $project->id) . '#' . $anchor)
+            ->with('success', "{$label} berhasil disimpan.");
+    }
+
+    private function clearProjectWeight(Request $request, Project $project, string $field, array $roles, string $label, string $anchor)
+    {
+        abort_unless(in_array(strtolower((string) $request->user()->role), $roles, true), 403);
+
+        $project->update([$field => null]);
+
+        return redirect()->to(route('projects.edit', $project->id) . '#' . $anchor)
+            ->with('success', "{$label} berhasil dihapus.");
+    }
+
     /**
      * Baca jobdesk custom QA/QC dari form (custom_tasks[ID][name|desc|progress|start|due|update|delete]).
      * Return [daftar baru | null bila tidak dikirim, peta new_N => task_custom_ID, progress lama, progress baru].
